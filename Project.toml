@@ -1,0 +1,13 @@
+name = "Metropolis"
+uuid = "02918670-6c22-4a47-9bc6-548bebbd8102"
+authors = ["Edwin Bedolla"]
+version = "0.1.0"
+
+[compat]
+julia = "0.1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
