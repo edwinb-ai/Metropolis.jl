@@ -19,7 +19,7 @@ function run(syst, dispm, simul; pos=nothing)
     # * Main loop
     # Equilibration steps
     move(positions, syst, simul.eq, dispm; volume=true)
-    JLD2.@save joinpath(@__DIR__, "data", positions_file) positions
+    JLD2.@save joinpath(@__DIR__, positions_file) positions
 
     # Sampling steps
     move(
@@ -28,12 +28,18 @@ function run(syst, dispm, simul; pos=nothing)
         simul.sample,
         dispm;
         volume=true,
-        filename=joinpath(@__DIR__, "results", save_file),
+        filename=joinpath(@__DIR__, save_file),
     )
 
     return nothing
 end
 
-(syst, dispm, simul, posfile) = parse_toml(joinpath(@__DIR__, "npt.toml"))
+function main()
+    (syst, dispm, simul, posfile) = parse_toml(joinpath(@__DIR__, "npt.toml"))
 
-run(syst, dispm, simul; pos=posfile)
+    run(syst, dispm, simul; pos=posfile)
+
+    return nothing
+end
+
+main()
