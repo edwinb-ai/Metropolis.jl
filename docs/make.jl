@@ -11,11 +11,7 @@ makedocs(;
         canonical="https://edwinb-ai.github.io/Metropolis.jl",
         assets=String[],
     ),
-    pages=[
-        "Home" => "index.md",
-    ],
+    pages=["Home" => "index.md"],
 )
 
-deploydocs(;
-    repo="github.com/edwinb-ai/Metropolis.jl",
-)
+deploydocs(; repo="github.com/edwinb-ai/Metropolis.jl")

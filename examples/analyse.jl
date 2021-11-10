@@ -6,7 +6,7 @@ using Statistics
 filedata = "npt_0.850_8.100.csv"
 
 to_analyse = joinpath("results", filedata)
-data = CSV.File(to_analyse; header = false)
+data = CSV.File(to_analyse; header=false)
 
 n_boot = 200000
 

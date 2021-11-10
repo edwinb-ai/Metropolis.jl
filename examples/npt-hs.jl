@@ -5,7 +5,7 @@ using StaticArrays
 
 function run(syst, dispm, simul; pos=nothing)
     # Create the positions vector
-    positions = [zeros(SVector{3}) for _ in 1:syst.N]
+    positions = [zeros(SVector{3}) for _ in 1:(syst.N)]
     if isnothing(pos)
         # Initialize the positions as grid
         init!(positions, syst)
@@ -30,6 +30,8 @@ function run(syst, dispm, simul; pos=nothing)
         volume=true,
         filename=joinpath(@__DIR__, "results", save_file),
     )
+
+    return nothing
 end
 
 (syst, dispm, simul, posfile) = parse_toml(joinpath(@__DIR__, "npt.toml"))

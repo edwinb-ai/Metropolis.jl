@@ -1,7 +1,7 @@
 function is_overlap(pos::AbstractArray, syst::System)
     rc = syst.σ^2
-    @inbounds for i = 1:syst.N - 1
-        for j = (i + 1):syst.N
+    @inbounds for i in 1:(syst.N - 1)
+        for j in (i + 1):(syst.N)
             Δij = pos[i] - pos[j]
 
             # Periodic boundaries
@@ -23,8 +23,8 @@ end
 
 function count_overlap(pos::AbstractArray, syst::System)
     rc = syst.σ^2
-    @inbounds for i = 1:syst.N - 1
-        for j = (i + 1):syst.N
+    @inbounds for i in 1:(syst.N - 1)
+        for j in (i + 1):(syst.N)
             Δij = pos[i] - pos[j]
 
             # Periodic boundaries
@@ -61,7 +61,7 @@ function move(
     samples = 0
 
     # Equilibration steps
-    @showprogress for i = 1:cycles
+    @showprogress for i in 1:cycles
         # * Attempt to move the particles around
         attempts += 1
         mc = metropolis!(positions, syst, disp)
