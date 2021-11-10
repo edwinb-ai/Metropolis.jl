@@ -1,7 +1,7 @@
 name = "Metropolis"
 uuid = "02918670-6c22-4a47-9bc6-548bebbd8102"
 authors = ["Edwin Bedolla"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
