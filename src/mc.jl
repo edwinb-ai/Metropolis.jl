@@ -1,6 +1,6 @@
 function metropolis!(pos::AbstractArray, syst::System, disp::Displacements)
     # Choose a random particle
-    rng_part = rand(syst.rng, 1:syst.N)
+    rng_part = rand(syst.rng, 1:(syst.N))
     # Save this particle's position
     posold = pos[rng_part]
     # Move that particle
@@ -59,7 +59,7 @@ function mcvolume!(pos::AbstractArray, syst::System, disp::Displacements)
         syst.L = ∛vol_old
         syst.vol = vol_old
         return 0
-    # We use the Metropolis criteria
+        # We use the Metropolis criteria
     else
         # Compute the energy difference
         ΔH = syst.P * (vol_new - vol_old) - (syst.N + 1) * log(vol_new / vol_old)

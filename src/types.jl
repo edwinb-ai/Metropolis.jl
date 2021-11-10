@@ -1,16 +1,16 @@
 using Random: AbstractRNG
 
-mutable struct Displacements{V <: Real}
+mutable struct Displacements{V<:Real}
     δV::V
     δr::V
 end
 
-mutable struct Simulation{V <: Int}
+mutable struct Simulation{V<:Int}
     eq::V
     sample::V
 end
 
-mutable struct System{V <: Real}
+mutable struct System{V<:Real}
     N::Int
     L::V
     σ::V

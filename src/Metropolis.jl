@@ -7,6 +7,7 @@ using StaticArrays
 using LinearAlgebra: norm
 using TOML
 using FileIO
+using JLD2
 
 include("types.jl")
 export Displacements, Simulation, System

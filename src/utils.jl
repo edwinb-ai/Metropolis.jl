@@ -12,9 +12,7 @@ function init!(positions::AbstractArray, syst::System)
 
     for i in axes(positions, 1)
         new_pos = SVector(
-            (ix + 0.5) * syst.L / n3,
-            (iy + 0.5) * syst.L / n3,
-            (iz + 0.5) * syst.L / n3
+            (ix + 0.5) * syst.L / n3, (iy + 0.5) * syst.L / n3, (iz + 0.5) * syst.L / n3
         )
         positions[i] = new_pos
         ix += 1
