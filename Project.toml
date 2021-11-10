@@ -3,8 +3,18 @@ uuid = "02918670-6c22-4a47-9bc6-548bebbd8102"
 authors = ["Edwin Bedolla"]
 version = "0.1.0"
 
+[deps]
+FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+RandomNumbers = "e6cf234a-135c-5ec9-84dd-332b85af5143"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+
 [compat]
-julia = "0.1"
+julia = "^1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
