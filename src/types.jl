@@ -1,4 +1,9 @@
-using Random: AbstractRNG
+"""
+    Ensemble
+
+A supertype for all kinds of ensembles.
+"""
+abstract type Ensemble end
 
 mutable struct Displacements{V<:Real}
     δV::V
@@ -20,5 +25,5 @@ mutable struct System{V<:Real}
     β::V
     P::V
     n_overlap::Int
-    rng::AbstractRNG
+    rng::Random.AbstractRNG
 end
