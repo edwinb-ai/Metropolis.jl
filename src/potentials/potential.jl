@@ -20,3 +20,7 @@ Type for all potentials that only implement a potential energy, due
 to its discontinuous nature. For example, the hard-sphere potential.
 """
 abstract type Discrete <: Potential end
+
+# Generic definitions for the interface
+energy(args...) = nothing
+force(args...) = nothing
