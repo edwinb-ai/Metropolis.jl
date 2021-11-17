@@ -6,9 +6,3 @@ function random_vec(::Type{VT}, range; rng=Random.GLOBAL_RNG) where {VT}
 
     return p
 end
-
-function tofile(x::String, filename::String)
-    open(filename, "a") do io
-        println(io, x)
-    end
-end
