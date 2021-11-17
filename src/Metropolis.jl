@@ -7,6 +7,7 @@ using StaticArrays
 using LinearAlgebra
 using FileIO
 using CellListMap
+using Parameters
 
 # Includes
 include("types.jl")
