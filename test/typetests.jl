@@ -4,6 +4,6 @@
     parts = 1000
     s = System(ρ, kT, parts)
 
-    @test size(s.xpos) == parts
-    @test size(s.xpos[1]) == 3
+    @test length(s.xpos) == parts
+    @test length(s.xpos[1]) == 3
 end
