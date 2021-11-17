@@ -1,3 +1,3 @@
-struct NVT{V <: Real} <: Ensemble
+struct NVT{V<:Real} <: Ensemble
     δr::V
 end
