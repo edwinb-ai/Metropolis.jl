@@ -2,5 +2,7 @@ using Metropolis
 using Test
 
 @testset "Metropolis.jl" begin
-    # Write your tests here.
+    lj = LennardJones()
+    @test potential_energy(lj) isa Function
+    @test forces(lj) isa Function
 end

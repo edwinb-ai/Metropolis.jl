@@ -9,13 +9,20 @@ using TOML
 using FileIO
 using JLD2
 
+# Includes
+include(joinpath("potentials", "potential.jl"))
+include(joinpath("potentials", "lennard_jones.jl"))
 include("types.jl")
-export Displacements, Simulation, System
 include("utils.jl")
-export parse_toml, init!, tofile
 include("move.jl")
-export move, count_overlap, is_overlap
 include("mc.jl")
+
+# Exports
+export Displacements, Simulation, System
+export parse_toml, init!, tofile
+export move, count_overlap, is_overlap
 export mcvolume!, metropolis!
+# Interfaces
+export Discrete, Continuous, LennardJones, potential_energy, forces
 
 end
