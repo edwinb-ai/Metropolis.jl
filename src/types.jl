@@ -6,6 +6,13 @@ A supertype for all kinds of ensembles.
 abstract type Ensemble end
 
 """
+    Potential
+
+Supertype for all kinds of interaction potentials.
+"""
+abstract type Potential end
+
+"""
     System{V<:Real}
 
 Holds all relevant information for the simulation system.
@@ -51,4 +58,22 @@ function System(density::T, temp::T, particles::Int, cutoff::T; dims=3) where {T
     syst = System(xpos, density, temp, box, cutoff, rng, particles)
 
     return syst
+end
+
+"""
+    Simulation
+
+A type to hold all relevant information for the simulation.
+
+# Fields
+- `system::S`: ideally, a `System` type that has all the information about the positions
+    and physical information on the system.
+- `ensemble::E`: this is the _statistical ensemble_ used for doing the simulation, ideally
+    of type `Ensemble`.
+- `potential::P`: the interaction potential between the particles, ideally an object of
+"""
+struct Simulation
+    system::System
+    ensemble::Ensemble
+    potential::Potential
 end

@@ -1,11 +1,4 @@
 """
-    Potential
-
-Supertype for all kinds of interaction potentials.
-"""
-abstract type Potential end
-
-"""
     Continuous <: Potential
 
 Type for all potentials that implement an potential energy

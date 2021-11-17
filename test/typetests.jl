@@ -16,3 +16,13 @@
     # Check that the position vectors are different among them
     @test s.xpos[1] != s.xpos[2] && s.xpos[fld(parts, 2)] != s.xpos[parts]
 end
+
+@testset "Simulations" begin
+    ρ = 0.5
+    kT = 1.0
+    parts = 10
+    s = System(ρ, kT, parts)
+    sim = Simulation(s, NVT(0.35), LennardJones())
+
+    @test sim isa Simulation
+end

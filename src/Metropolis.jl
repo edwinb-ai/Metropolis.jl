@@ -9,17 +9,16 @@ using FileIO
 using CellListMap
 
 # Includes
+include("types.jl")
 include(joinpath("potentials", "potential.jl"))
 include(joinpath("potentials", "lennard_jones.jl"))
-include("types.jl")
+include(joinpath("ensembles", "nvt.jl"))
 include("utils.jl")
 
-# Exports
-export System
-export init!, tofile
-export move, count_overlap, is_overlap
-export mcvolume!, metropolis!
+# * Exports
+# Types
+export System, Simulation, Discrete, Continuous, LennardJones, NVT
 # Interfaces
-export Discrete, Continuous, LennardJones, potential_energy, forces
+export potential_energy, forces
 
 end
