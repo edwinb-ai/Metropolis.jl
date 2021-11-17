@@ -10,4 +10,8 @@ abstract type Ensemble end
 
 Holds all relevant information from the simulation.
 """
-mutable struct System{V<:Real} end
+mutable struct System{V, VT}
+    density::V
+    temperature::V
+    xpos::VT
+end
