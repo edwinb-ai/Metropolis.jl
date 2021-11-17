@@ -1,7 +1,7 @@
 @testset "System" begin
     ρ = 0.5
     kT = 1.0
-    parts = 1000
+    parts = 10
 
     # Without specifying the cutoff
     s = System(ρ, kT, parts)
@@ -12,4 +12,7 @@
     cutoff = 3.0
     s = System(ρ, kT, parts, cutoff)
     @test s.cutoff == cutoff
+
+    # Check that the position vectors are different among them
+    @test s.xpos[1] != s.xpos[2] && s.xpos[fld(parts, 2)] != s.xpos[parts]
 end

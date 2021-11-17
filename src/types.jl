@@ -35,7 +35,8 @@ function System(density::T, temp::T, particles::Int; dims=3) where {T<:Real}
     cutoff = box_size / 2.0
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = fill(random_vec(SVector{3,Float64}, (zero(T), box_size); rng=rng), particles)
+    range = (zero(T), box_size)
+    xpos = [random_vec(SVector{3,Float64}, range; rng=rng) for _ in 1:particles]
     syst = System(xpos, density, temp, box, cutoff, rng, particles)
 
     return syst
@@ -45,7 +46,8 @@ function System(density::T, temp::T, particles::Int, cutoff::T; dims=3) where {T
     box_size = particles / density
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = fill(random_vec(SVector{3,Float64}, (zero(T), box_size); rng=rng), particles)
+    range = (zero(T), box_size)
+    xpos = [random_vec(SVector{3,Float64}, range; rng=rng) for _ in 1:particles]
     syst = System(xpos, density, temp, box, cutoff, rng, particles)
 
     return syst
