@@ -1,3 +1,12 @@
+function random_vec(::Type{VT}, range; rng=rng) where {VT}
+    dim = length(VT)
+    T = eltype(VT)
+    (lb, up) = range
+    p = VT(lb + rand(rng, T, dim) * (up - lb))
+
+    return p
+end
+
 function init!(positions::AbstractArray, syst::System)
     n3 = 2
     ix = 0

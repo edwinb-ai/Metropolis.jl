@@ -10,8 +10,11 @@ abstract type Ensemble end
 
 Holds all relevant information from the simulation.
 """
-mutable struct System{V,VT}
-    density::V
-    temperature::V
+mutable struct System{UnitCellType,N,T,M,VT}
     xpos::VT
+    density::T
+    temperature::T
+    box::CellListMap.Box{UnitCellType,N,T,M}
+    cutoff::T
+    rng::Random.AbstractRNG
 end
