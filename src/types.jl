@@ -14,7 +14,8 @@ Holds all relevant information for the simulation system.
 - `xpos::VT`: stores the array for the positions of the particles.
 - `density::T`: the density of the system.
 - `temperature::T`: the temperature of the system.
-- `box::CellListMap.Box{UnitCellType,N,T,M}`: simulation box that will get updated as the simulation runs.
+- `box::CellListMap.Box{UnitCellType,N,T,M}`: simulation box that will get updated as the
+    simulation runs.
 - `cutoff::T`: cutoff radius for the molecular interactions
 - `rng::Random.AbstractRNG`: holds the RNG object for the system
 - `npart::Int`: total number of particles in the system
