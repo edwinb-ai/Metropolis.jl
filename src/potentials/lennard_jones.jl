@@ -12,7 +12,7 @@ end
 
 # Implement the generic interfaces
 function potential_energy(lj::LennardJones)
-    lj_energy(x, y, i, j, d2, u) = u += lj.energy(d2)
+    lj_energy(x, y, i, j, d2, u) = u = lj.energy(d2)
 
     return lj_energy
 end

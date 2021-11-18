@@ -42,8 +42,8 @@ end
 function adjust!(opts::EnsembleOptions)
     @unpack ensemble, nattempt, naccept = opts
 
-    if nattempt%naccept == 0
-        ratio = nacc / nattemp
+    if nattempt % naccept == 0
+        ratio = naccept / nattempt
         if ratio > ensemble.accept
             ensemble.δr *= 1.05
         else

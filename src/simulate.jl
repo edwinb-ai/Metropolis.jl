@@ -8,8 +8,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     fij = forces(potential)
 
     # Build initial cell lists
-    x = copy(system.xpos)
-    cl = CellList(x, system.box; parallel=parallel)
+    cl = CellList(copy(system.xpos), system.box; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
@@ -24,7 +23,10 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
 
         if istep % 1_000 == 0
             @show uenergy / system.npart
+            @show opts.naccept / opts.nattempt
         end
+
+        adjust!(opts)
     end
 
     return nothing
