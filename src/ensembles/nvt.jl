@@ -18,7 +18,7 @@ function mcmove!(
     posold = syst.xpos[rng_part]
     vec_size = length(posold)
     # Move that particle
-    half_disp = SVector{vec_size,eltype(posold)}(0.5 .- rand(syst.rng, vec_size))
+    half_disp = Vec3D(0.5 .- rand(syst.rng, vec_size))
     new_pos = @. posold + ensemble.δr * half_disp
     syst.xpos[rng_part] = new_pos
     # Update cell lists

@@ -5,6 +5,12 @@ Supertype for all kinds of interaction potentials.
 """
 abstract type Potential end
 
+struct Vec3D{T} <: FieldVector{3,T}
+    x::T
+    y::T
+    z::T
+end
+
 """
     System{V<:Real}
 
@@ -20,35 +26,33 @@ Holds all relevant information for the simulation system.
 - `rng::Random.AbstractRNG`: holds the RNG object for the system
 - `npart::Int`: total number of particles in the system
 """
-mutable struct System{UnitCellType,N,T,M,VT}
+mutable struct System{UnitCellType,N,T,M,VT,I}
     xpos::VT
     density::T
     temperature::T
     box::CellListMap.Box{UnitCellType,N,T,M}
     rng::Random.AbstractRNG
-    npart::Int
+    npart::I
 end
 
 function System(
-    density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true, lcell=2
-) where {T<:Real}
+    density::T, temp::T, particles::N, cutoff::T; dims=3, random_init=true, lcell=2
+) where {T,N}
     box_size = cbrt(particles / density)
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = initialize_positions(
-        box_size, rng, particles; dims=dims, random_init=random_init
-    )
+    xpos = initialize_positions(box_size, rng, particles; random_init=random_init)
     syst = System(xpos, density, temp, box, rng, particles)
 
     return syst
 end
 
-function initialize_positions(box_size, rng, particles; dims=3, random_init=true)
+function initialize_positions(box_size::T, rng, particles; random_init=true) where {T<:Real}
+    xpos = [zeros(Vec3D{T}) for _ in 1:particles]
     if random_init
         range = (zero(typeof(box_size)), box_size)
-        xpos = [random_vec(SVector{dims,Float64}, range; rng=rng) for _ in 1:particles]
+        xpos = [random_vec(Vec3D{T}, range; rng=rng) for _ in 1:particles]
     else
-        xpos = [zeros(SVector{dims,Float64}) for _ in 1:particles]
         square_lattice!(xpos, particles, box_size)
     end
 
