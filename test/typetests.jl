@@ -2,16 +2,12 @@
     ρ = 0.5
     kT = 1.0
     parts = 10
+    cutoff = 1.2
 
     # Without specifying the cutoff
-    s = System(ρ, kT, parts)
+    s = System(ρ, kT, parts, cutoff)
     @test length(s.xpos) == parts
     @test length(s.xpos[1]) == 3
-
-    # Specifying the cutoff
-    cutoff = cbrt(ρ / parts) / 2.0
-    s = System(ρ, kT, parts, cutoff)
-    @test s.cutoff == cutoff
 
     # Check that the position vectors are different among them
     @test s.xpos[1] != s.xpos[2] && s.xpos[fld(parts, 2)] != s.xpos[parts]
@@ -21,7 +17,8 @@ end
     ρ = 0.5
     kT = 1.0
     parts = 10
-    s = System(ρ, kT, parts)
+    cutoff = 1.2
+    s = System(ρ, kT, parts, cutoff)
     sim = Simulation(s, NVT(0.35), LennardJones())
 
     @test sim isa Simulation
