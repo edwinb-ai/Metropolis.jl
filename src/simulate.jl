@@ -18,7 +18,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     # * Simulation loop
     for istep in 1:steps
         opts.nattempt += 1
-        (upot, cl) = mcmove!(system, uij, fij, opts, cl)
+        (upot, cl) = mcmove!(system, uij, fij, opts, cl; parallel=parallel)
 
         if istep % ishow == 0
             @show upot / system.npart
