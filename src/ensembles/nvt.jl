@@ -6,8 +6,10 @@ end
 NVT(x::V) where {V<:Real} = NVT(V(0.5), V(x))
 
 function mcmove!(
-    syst::System, ens::E, uij, fij, opts::EnsembleOptions{T,E}, cl
+    syst::System, uij, fij, opts::EnsembleOptions{T,E}, cl
 ) where {E<:NVT,T<:Real}
+    @unpack ensemble, nattempt, naccept = opts
+
     # Compute the current energy
     uold = map_pairwise!(uij, 0.0, syst.box.box, cl)
     # Choose a random particle
@@ -17,7 +19,7 @@ function mcmove!(
     vec_size = length(posold)
     # Move that particle
     half_disp = SVector{vec_size,eltype(posold)}(0.5 .- rand(syst.rng, vec_size))
-    new_pos = @. posold + ens.δr * half_disp
+    new_pos = @. posold + ensemble.δr * half_disp
     boxl = syst.box.box.unit_cell_max[1]
     syst.xpos[rng_part] = new_pos
     @inbounds for (i, p) in enumerate(syst.xpos)
@@ -33,13 +35,15 @@ function mcmove!(
     if unew < uold
         if rand(syst.rng) < exp(-Δener / syst.temperature)
             uold = Δener
-            opts.naccept += 1
+            naccept += 1
         end
     else
         syst.xpos[rng_part] = posold
         # Update cell lists
         cl = UpdateCellList!(syst.xpos, syst.box.box, cl)
     end
+
+    @pack! opts = naccept
 
     return uold, cl
 end

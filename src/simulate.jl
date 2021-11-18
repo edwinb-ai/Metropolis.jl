@@ -20,7 +20,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     # * Simulation loop
     for istep in 1:steps
         opts.nattempt += 1
-        (upot, cl) = mcmove!(system, ensemble, uij, fij, opts, cl)
+        (upot, cl) = mcmove!(system, uij, fij, opts, cl)
         uenergy += upot
 
         if istep % 1_000 == 0
