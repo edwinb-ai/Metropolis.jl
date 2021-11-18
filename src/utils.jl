@@ -35,4 +35,21 @@ function square_lattice!(positions, boxl, npart)
             end
         end
     end
+
+    return nothing
+end
+
+function adjust!(opts::EnsembleOptions)
+    @unpack ensemble, nattempt, naccept = opts
+
+    if nattempt%naccept == 0
+        ratio = nacc / nattemp
+        if ratio > ensemble.accept
+            ensemble.δr *= 1.05
+        else
+            ensemble.δr *= 0.95
+        end
+    end
+
+    return nothing
 end

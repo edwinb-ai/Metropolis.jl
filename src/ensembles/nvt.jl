@@ -1,4 +1,4 @@
-struct NVT{V<:Real} <: Ensemble
+mutable struct NVT{V<:Real} <: Ensemble
     δr::V
     accept::V
 end

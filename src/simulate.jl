@@ -15,6 +15,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     opts = EnsembleOptions(ensemble)
 
     uenergy = map_pairwise!(uij, 0.0, system.box, cl)
+    println("initial energy $(uenergy)")
 
     # * Simulation loop
     for istep in 1:steps
