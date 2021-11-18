@@ -34,7 +34,7 @@ function mcmove!(
 
     if unew < uold
         if rand(syst.rng) < exp(-Δener / syst.temperature)
-            uold = Δener
+            uold += Δener
             naccept += 1
         end
     else

@@ -33,7 +33,7 @@ function System(
     density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true
 ) where {T<:Real}
     box_size = cbrt(particles / density)
-    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
+    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=3)
     rng = Xorshifts.Xoroshiro128Plus()
     xpos = initialize_positions(
         box_size, rng, particles; dims=dims, random_init=random_init
@@ -45,7 +45,7 @@ end
 
 function initialize_positions(box_size, rng, particles; dims=3, random_init=true)
     if random_init
-        range = (zero(T), box_size)
+        range = (zero(typeof(box_size)), box_size)
         xpos = [random_vec(SVector{dims,Float64}, range; rng=rng) for _ in 1:particles]
     else
         xpos = [zeros(SVector{dims,Float64}) for _ in 1:particles]

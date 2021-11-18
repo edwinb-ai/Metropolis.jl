@@ -20,6 +20,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     (pack_pos, boxpack, clpack) = packpositions(copy(system.xpos), system.box)
     cl = UpdateCellList!(pack_pos, system.box, cl)
     upacked = u_pack(pack_pos, boxpack, clpack)
+    system.xpos = copy(pack_pos)
     @show upacked
 
     uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
@@ -29,10 +30,10 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     for istep in 1:steps
         opts.nattempt += 1
         (upot, cl) = mcmove!(system, uij, fij, opts, cl)
-        uenergy += upot
+        # uenergy += upot
 
         if istep % 1_000 == 0
-            @show uenergy / system.npart
+            # @show uenergy / system.npart
             @show upot / system.npart
             @show opts.naccept / opts.nattempt
         end

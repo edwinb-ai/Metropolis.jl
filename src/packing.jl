@@ -56,7 +56,7 @@ function forces_cl!(f::Vector{T}, x, box::Box, cl::CellList, fpair::F) where {T,
 end
 
 function packpositions(positions, box::Box)
-    box_pack = Box(fill(box.unit_cell_max, length(positions[begin])), 1.2)
+    box_pack = Box(box.unit_cell_max, 0.5)
     cl_pack = CellList(positions, box_pack)
     xpos = gradient_descent!(
         copy(positions),
