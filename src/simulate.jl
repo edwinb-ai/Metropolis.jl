@@ -1,6 +1,6 @@
 function simulate! end
 
-function simulate!(sim::Simulation; steps=10_000, parallel=false)
+function simulate!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     @unpack system, ensemble, potential = sim
 
     # Obtain the energy function for the interaction potential
@@ -20,7 +20,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
         opts.nattempt += 1
         (upot, cl) = mcmove!(system, uij, fij, opts, cl)
 
-        if istep % 1_000 == 0
+        if istep % ishow == 0
             @show upot / system.npart
             @show opts.naccept / opts.nattempt
         end
