@@ -15,12 +15,12 @@ function mcmove!(
     # Choose a random particle
     rng_part = rand(syst.rng, 1:(syst.npart))
     # Save this particle's position
-    posold = syst.xpos[rng_part]
+    posold = copy(syst.xpos[rng_part])
     vec_size = length(posold)
     # Move that particle
     half_disp = Vec3D(0.5 .- rand(syst.rng, vec_size))
     new_pos = @. posold + ensemble.δr * half_disp
-    syst.xpos[rng_part] = new_pos
+    syst.xpos[rng_part] = copy(new_pos)
     # Update cell lists
     cl = UpdateCellList!(syst.xpos, syst.box, cl; parallel=parallel)
     # Compute the energy now
