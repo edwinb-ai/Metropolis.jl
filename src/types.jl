@@ -30,10 +30,10 @@ mutable struct System{UnitCellType,N,T,M,VT}
 end
 
 function System(
-    density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true
+    density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true, lcell=2
 ) where {T<:Real}
     box_size = cbrt(particles / density)
-    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
+    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
     xpos = initialize_positions(
         box_size, rng, particles; dims=dims, random_init=random_init
