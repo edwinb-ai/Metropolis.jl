@@ -7,7 +7,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     (uij, fij) = interactions(potential)
 
     # Build initial cell lists
-    cl = CellList(copy(system.xpos), system.box; parallel=parallel)
+    cl = CellListMap.CellList(copy(system.xpos), system.box; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)

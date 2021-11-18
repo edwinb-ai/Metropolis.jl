@@ -26,25 +26,32 @@ Holds all relevant information for the simulation system.
 - `rng::Random.AbstractRNG`: holds the RNG object for the system
 - `npart::Int`: total number of particles in the system
 """
-mutable struct System{UnitCellType,N,T,M,VT,I}
+mutable struct System{B,T,VT,I}
     xpos::VT
     density::T
     temperature::T
-    box::CellListMap.Box{UnitCellType,N,T,M}
+    box::B
     rng::Random.AbstractRNG
     npart::I
 end
 
 function System(
-    density::T, temp::T, particles::N, cutoff::T; dims=3, random_init=true, lcell=2
-) where {T,N}
-    box_size = cbrt(particles / density)
+    density::T, temp::T, particles::I, cutoff::T; dims=3, random_init=true, lcell=2
+) where {T<:Real,I<:Int}
+    box_size = cbrt(T(particles) / density)
+    # box = create_box(box_size, dims, cutoff; lcell=lcell)
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
     xpos = initialize_positions(box_size, rng, particles; random_init=random_init)
     syst = System(xpos, density, temp, box, rng, particles)
 
     return syst
+end
+
+function create_box(box_size::T, dims::I, cutoff::T; lcell=2) where {T,I}
+    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
+
+    return box
 end
 
 function initialize_positions(box_size::T, rng, particles; random_init=true) where {T<:Real}
