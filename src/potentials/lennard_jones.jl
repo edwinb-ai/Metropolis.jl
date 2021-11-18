@@ -24,7 +24,7 @@ end
 function forces(lj::LennardJones)
     function lj_forces(x, y, i, j, d2, f)
         r = x - y
-        dudr = lj.forces(d2, r)
+        dudr = lj.force(d2, r)
         @inbounds f[i] = f[i] + dudr
         @inbounds f[j] = f[j] - dudr
 

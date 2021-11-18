@@ -11,7 +11,7 @@ function mcmove!(
     @unpack ensemble, nattempt, naccept = opts
 
     # Compute the current energy
-    uold = map_pairwise!(uij, 0.0, syst.box.box, cl)
+    uold = map_pairwise!(uij, 0.0, syst.box, cl)
     # Choose a random particle
     rng_part = rand(syst.rng, 1:(syst.npart))
     # Save this particle's position
@@ -20,16 +20,16 @@ function mcmove!(
     # Move that particle
     half_disp = SVector{vec_size,eltype(posold)}(0.5 .- rand(syst.rng, vec_size))
     new_pos = @. posold + ensemble.δr * half_disp
-    boxl = syst.box.box.unit_cell_max[1]
+    boxl = syst.box.unit_cell_max[1]
     syst.xpos[rng_part] = new_pos
     @inbounds for (i, p) in enumerate(syst.xpos)
         new_pos = @. p - boxl * round(p / boxl)
         syst.xpos[i] = new_pos
     end
     # Update cell lists
-    cl = UpdateCellList!(syst.xpos, syst.box.box, cl)
+    cl = UpdateCellList!(syst.xpos, syst.box, cl)
     # Compute the energy now
-    unew = map_pairwise!(uij, 0.0, syst.box.box, cl)
+    unew = map_pairwise!(uij, 0.0, syst.box, cl)
     Δener = unew - uold
 
     if unew < uold
@@ -40,7 +40,7 @@ function mcmove!(
     else
         syst.xpos[rng_part] = posold
         # Update cell lists
-        cl = UpdateCellList!(syst.xpos, syst.box.box, cl)
+        cl = UpdateCellList!(syst.xpos, syst.box, cl)
     end
 
     @pack! opts = naccept
