@@ -17,7 +17,7 @@ function simulate!(sim::Simulation; steps=10_000, parallel=false)
     uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
     println("initial energy $(uenergy)")
 
-    (pack_pos, boxpack, clpack) = packpositions(copy(system.xpos), system.sbox)
+    (pack_pos, boxpack, clpack) = packpositions(copy(system.xpos), system.box)
     cl = UpdateCellList!(pack_pos, system.box, cl)
     upacked = u_pack(pack_pos, boxpack, clpack)
     @show upacked

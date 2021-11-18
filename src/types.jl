@@ -24,7 +24,7 @@ mutable struct System{UnitCellType,N,T,M,VT}
     xpos::VT
     density::T
     temperature::T
-    sbox::CellListMap.Box{UnitCellType,N,T,M}
+    box::CellListMap.Box{UnitCellType,N,T,M}
     rng::Random.AbstractRNG
     npart::Int
 end
@@ -35,7 +35,9 @@ function System(
     box_size = cbrt(particles / density)
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = initialize_positions(box, rng, particles; dims=dims, random_init=random_init)
+    xpos = initialize_positions(
+        box_size, rng, particles; dims=dims, random_init=random_init
+    )
     syst = System(xpos, density, temp, box, rng, particles)
 
     return syst
