@@ -16,11 +16,12 @@ include(joinpath("potentials", "lennard_jones.jl"))
 include(joinpath("ensembles", "ensemble.jl"))
 include(joinpath("ensembles", "nvt.jl"))
 include("utils.jl")
+include("simulate.jl")
 
 # * Exports
 # Types
 export System, Simulation, Discrete, Continuous, LennardJones, NVT
 # Interfaces
-export potential_energy, forces
+export potential_energy, forces, simulate!
 
 end
