@@ -4,6 +4,6 @@
     parts = 1000
     cutoff = 2.5
     s = System(ρ, kT, parts, cutoff)
-    sim = Simulation(s, NVT(0.35), LennardJones())
-    simulate!(sim; steps=100_000)
+    sim = Simulation(s, NVT(0.01, 0.35), LennardJones())
+    @code_warntype simulate!(sim; steps=100_000)
 end

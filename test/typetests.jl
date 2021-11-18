@@ -9,7 +9,7 @@
     @test length(s.xpos[1]) == 3
 
     # Specifying the cutoff
-    cutoff = 3.0
+    cutoff = cbrt(ρ / parts) / 2.0
     s = System(ρ, kT, parts, cutoff)
     @test s.cutoff == cutoff
 
