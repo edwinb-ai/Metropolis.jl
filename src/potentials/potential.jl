@@ -15,5 +15,12 @@ to its discontinuous nature. For example, the hard-sphere potential.
 abstract type Discrete <: Potential end
 
 # Generic definitions for the interface
-function potential_energy end
-function forces end
+potential_energy(args...) = nothing
+forces(args...) = nothing
+
+function interactions(potential::Potential)
+    uij = potential_energy(potential)
+    fij = forces(potential)
+
+    return uij, fij
+end

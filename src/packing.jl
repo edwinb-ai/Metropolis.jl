@@ -66,3 +66,19 @@ function packpositions(positions, box::Box)
 
     return xpos, box_pack, cl_pack
 end
+
+function packsystem!(system::System, cl::CellList, uij)
+    uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
+    println("initial energy $(uenergy)")
+
+    (pack_pos, boxpack, clpack) = packpositions(copy(system.xpos), system.box)
+    cl = UpdateCellList!(pack_pos, system.box, cl)
+    upacked = u_pack(pack_pos, boxpack, clpack)
+    system.xpos = copy(pack_pos)
+    @show upacked
+
+    uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
+    println("initial energy $(uenergy)")
+
+    return nothing
+end
