@@ -11,7 +11,7 @@ function mcmove!(
     @unpack ensemble, nattempt, naccept = opts
 
     # Compute the current energy
-    uold = map_pairwise!(uij, 0.0, syst.box, cl; parallel=parallel)
+    uold = map_pairwise!(uij, zero(T), syst.box, cl; parallel=parallel)
     # Choose a random particle
     rng_part = rand(syst.rng, 1:(syst.npart))
     # Save this particle's position
@@ -24,7 +24,7 @@ function mcmove!(
     # Update cell lists
     cl = UpdateCellList!(syst.xpos, syst.box, cl; parallel=parallel)
     # Compute the energy now
-    unew = map_pairwise!(uij, 0.0, syst.box, cl; parallel=parallel)
+    unew = map_pairwise!(uij, zero(T), syst.box, cl; parallel=parallel)
     Δener = unew - uold
 
     if unew < uold

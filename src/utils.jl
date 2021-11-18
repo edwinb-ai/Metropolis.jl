@@ -20,7 +20,7 @@ function square_lattice!(positions, boxl, npart)
     end
 
     for i in axes(positions, 1)
-        new_pos = SVector(
+        new_pos = Vec3D(
             (ix + 0.5) * boxl / n3, (iy + 0.5) * boxl / n3, (iz + 0.5) * boxl / n3
         )
         positions[i] = new_pos
@@ -50,6 +50,8 @@ function adjust!(opts::EnsembleOptions)
             ensemble.δr *= 0.95
         end
     end
+
+    @pack! opts = ensemble, nattempt, naccept
 
     return nothing
 end
