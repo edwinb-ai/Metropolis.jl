@@ -17,6 +17,7 @@ include(joinpath("ensembles", "ensemble.jl"))
 include(joinpath("ensembles", "nvt.jl"))
 include("utils.jl")
 include("simulate.jl")
+include("packing.jl")
 
 # * Exports
 # Types

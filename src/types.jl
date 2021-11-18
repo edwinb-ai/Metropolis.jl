@@ -47,8 +47,8 @@ end
 function System(
     density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true
 ) where {T<:Real}
-    box_size = cbrt(particles / density)
-    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
+    box_size = cbrt(T(particles) / density)
+    box = Box(fill(box_size, dims), cutoff; lcell=3)
     rng = Xorshifts.Xoroshiro128Plus()
 
     if random_init
