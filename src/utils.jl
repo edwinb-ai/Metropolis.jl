@@ -1,4 +1,13 @@
-function init!(positions::AbstractArray, syst::System)
+function random_vec(::Type{VT}, range; rng=Random.GLOBAL_RNG) where {VT}
+    dim = length(VT)
+    T = eltype(VT)
+    (lb, up) = range
+    p = VT(lb .+ rand(rng, T, dim) .* (up - lb))
+
+    return p
+end
+
+function square_lattice!(positions, boxl, npart)
     n3 = 2
     ix = 0
     iy = 0
@@ -6,13 +15,13 @@ function init!(positions::AbstractArray, syst::System)
 
     # Find the lowest perfect cube, n3, greater than or equal to the
     # number of particles
-    while n3^3 < syst.N
+    while n3^3 < npart
         n3 += 1
     end
 
     for i in axes(positions, 1)
         new_pos = SVector(
-            (ix + 0.5) * syst.L / n3, (iy + 0.5) * syst.L / n3, (iz + 0.5) * syst.L / n3
+            (ix + 0.5) * boxl / n3, (iy + 0.5) * boxl / n3, (iz + 0.5) * boxl / n3
         )
         positions[i] = new_pos
         ix += 1
@@ -26,73 +35,21 @@ function init!(positions::AbstractArray, syst::System)
             end
         end
     end
+
+    return nothing
 end
 
-function tofile(x::String, filename::String)
-    open(filename, "a") do io
-        println(io, x)
-    end
-end
+function adjust!(opts::EnsembleOptions)
+    @unpack ensemble, nattempt, naccept = opts
 
-function parse_toml(s::String)
-    result = TOML.parsefile(s)
-
-    syst = System(0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, MersenneTwister())
-
-    for (i, j) in result["system"]
-        if i == "particles"
-            syst.N = j
-        elseif i == "pressure"
-            syst.P = j
-        elseif i == "density"
-            syst.ρ = j
-        elseif i == "temperature"
-            syst.β == 1 / j
+    if nattempt % naccept == 0
+        ratio = naccept / nattempt
+        if ratio > ensemble.accept
+            ensemble.δr *= 1.05
+        else
+            ensemble.δr *= 0.95
         end
     end
 
-    syst.vol = syst.N / syst.ρ
-    syst.L = ∛(syst.vol)
-
-    if "seed" in keys(result["system"])
-        syst.rng = Xoroshiro128Plus(result["system"]["seed"])
-    else
-        syst.rng = Xoroshiro128Plus()
-    end
-
-    dispm = Displacements(1.0, 0.5)
-
-    for (i, j) in result["displacements"]
-        if i == "position"
-            dispm.δr = j
-        elseif i == "logvolume"
-            dispm.δV = j
-        end
-    end
-
-    simulation = Simulation(100000, 200000)
-
-    for (i, j) in result["simulation"]
-        if i == "equilibration"
-            simulation.eq = j
-        elseif i == "sampling"
-            simulation.sample = j
-        end
-    end
-
-    if "title" in keys(result)
-        println(result["title"])
-        println("Initial density: $(syst.ρ)")
-        println("Pressure: $(syst.P)")
-    end
-
-    positions = zeros(3, syst.N)
-    if "positions" in keys(result)
-        println("Reading positions from file...")
-        JLD2.@load result["positions"]["file"] positions
-    else
-        positions = nothing
-    end
-
-    return (syst, dispm, simulation, positions)
+    return nothing
 end

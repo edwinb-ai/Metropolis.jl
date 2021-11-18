@@ -2,5 +2,7 @@ using Metropolis
 using Test
 
 @testset "Metropolis.jl" begin
-    # Write your tests here.
+    include("test_interface.jl")
+    include("typetests.jl")
+    # include("simulationtests.jl")
 end

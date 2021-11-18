@@ -4,18 +4,25 @@ using Random
 using RandomNumbers.Xorshifts
 using ProgressMeter
 using StaticArrays
-using LinearAlgebra: norm
-using TOML
+using LinearAlgebra
 using FileIO
-using JLD2
+using CellListMap
+using Parameters
 
+# Includes
 include("types.jl")
-export Displacements, Simulation, System
+include(joinpath("potentials", "potential.jl"))
+include(joinpath("potentials", "lennard_jones.jl"))
+include(joinpath("ensembles", "ensemble.jl"))
+include(joinpath("ensembles", "nvt.jl"))
 include("utils.jl")
-export parse_toml, init!, tofile
-include("move.jl")
-export move, count_overlap, is_overlap
-include("mc.jl")
-export mcvolume!, metropolis!
+include("simulate.jl")
+include("packing.jl")
+
+# * Exports
+# Types
+export System, Simulation, Discrete, Continuous, LennardJones, NVT
+# Interfaces
+export potential_energy, forces, simulate!
 
 end
