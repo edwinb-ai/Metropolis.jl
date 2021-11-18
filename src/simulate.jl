@@ -2,18 +2,19 @@ function simulate! end
 
 function simulate!(sim::Simulation; steps=10_000, parallel=false)
     @unpack system, ensemble, potential = sim
+    # @unpack xpos, density, temperature, box, rng, npart = system
 
     # Obtain the energy function for the interaction potential
     uij = potential_energy(potential)
     fij = forces(potential)
 
     # Build initial cell lists
-    cl = CellList(system.xpos, system.box; parallel=parallel)
+    cl = CellList(copy(system.xpos), system.box.box; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
 
-    uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
+    uenergy = map_pairwise!(uij, 0.0, system.box.box, cl) / system.npart
     println("initial energy $(uenergy)")
 
     # * Simulation loop

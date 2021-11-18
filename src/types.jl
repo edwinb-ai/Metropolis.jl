@@ -5,6 +5,12 @@ Supertype for all kinds of interaction potentials.
 """
 abstract type Potential end
 
+mutable struct SystemBox{UnitCellType,N,T,M}
+    box::CellListMap.Box{UnitCellType,N,T,M}
+    box_size::T
+    cutoff::T
+end
+
 """
     System{V<:Real}
 
@@ -20,48 +26,42 @@ Holds all relevant information for the simulation system.
 - `rng::Random.AbstractRNG`: holds the RNG object for the system
 - `npart::Int`: total number of particles in the system
 """
-mutable struct System{UnitCellType,N,T,M,VT}
+mutable struct System{T,VT}
     xpos::VT
     density::T
     temperature::T
-    box::CellListMap.Box{UnitCellType,N,T,M}
-    cutoff::T
+    box::SystemBox
     rng::Random.AbstractRNG
     npart::Int
-end
-
-function System(density::T, temp::T, particles::Int; dims=3) where {T<:Real}
-    box_size = cbrt(particles / density)
-    cutoff = box_size / 2.0
-    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
-    rng = Xorshifts.Xoroshiro128Plus()
-    range = (zero(T), box_size)
-    # xpos = [random_vec(SVector{dims,Float64}, range; rng=rng) for _ in 1:particles]
-    xpos = [zeros(SVector{dims,Float64}) for _ in 1:particles]
-    square_lattice!(xpos, particles, box_size)
-    syst = System(xpos, density, temp, box, cutoff, rng, particles)
-
-    return syst
 end
 
 function System(
     density::T, temp::T, particles::Int, cutoff::T; dims=3, random_init=true
 ) where {T<:Real}
-    box_size = cbrt(T(particles) / density)
-    box = Box(fill(box_size, dims), cutoff; lcell=3)
+    box = create_box(density, cutoff, particles; dims=dims)
     rng = Xorshifts.Xoroshiro128Plus()
+    xpos = initialize_positions(box, rng, particles; dims=dims, random_init=random_init)
+    syst = System(xpos, density, temp, box, rng, particles)
 
+    return syst
+end
+
+function create_box(density::T, cutoff::T, particles::V; dims=3) where {T<:Real,V<:Int}
+    box_size = cbrt(particles / density)
+    box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=2)
+    return SystemBox(box, box_size, cutoff)
+end
+
+function initialize_positions(box::SystemBox, rng, particles; dims=3, random_init=true)
     if random_init
-        range = (zero(T), box_size)
+        range = (zero(T), box.box_size)
         xpos = [random_vec(SVector{dims,Float64}, range; rng=rng) for _ in 1:particles]
     else
         xpos = [zeros(SVector{dims,Float64}) for _ in 1:particles]
-        square_lattice!(xpos, particles, box_size)
+        square_lattice!(xpos, particles, box.box_size)
     end
 
-    syst = System(xpos, density, temp, box, cutoff, rng, particles)
-
-    return syst
+    return xpos
 end
 
 """
