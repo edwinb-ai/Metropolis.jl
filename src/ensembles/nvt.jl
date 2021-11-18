@@ -5,22 +5,23 @@ end
 
 NVT(x::V) where {V<:Real} = NVT(V(0.5), V(x))
 
+function _choose_move!(positions, npart, rng, δr)
+    rng_part = rand(rng, 1:(npart))
+    posold = positions[rng_part]
+    vec_size = length(posold)
+    # Move that particle
+    half_disp = Vec3D(0.5 .- rand(rng, vec_size))
+    positions[rng_part] = posold .+ δr .* half_disp
+
+    return posold, rng_part
+end
+
 function mcmove!(
     syst::System, uij, fij, opts::EnsembleOptions{T,E}, cl; parallel=false
 ) where {E<:NVT,T<:Real}
-    @unpack ensemble, nattempt, naccept = opts
-
     # Compute the current energy
     uold = map_pairwise!(uij, zero(T), syst.box, cl; parallel=parallel)
-    # Choose a random particle
-    rng_part = rand(syst.rng, 1:(syst.npart))
-    # Save this particle's position
-    posold = copy(syst.xpos[rng_part])
-    vec_size = length(posold)
-    # Move that particle
-    half_disp = Vec3D(0.5 .- rand(syst.rng, vec_size))
-    new_pos = @. posold + ensemble.δr * half_disp
-    syst.xpos[rng_part] = copy(new_pos)
+    (posold, rng_part) = _choose_move!(syst.xpos, syst.npart, syst.rng, opts.ensemble.δr)
     # Update cell lists
     cl = UpdateCellList!(syst.xpos, syst.box, cl; parallel=parallel)
     # Compute the energy now
@@ -28,9 +29,9 @@ function mcmove!(
     Δener = unew - uold
 
     if unew < uold
-        if rand(syst.rng) < exp(-Δener / syst.temperature)
+        if rand(syst.rng, T) < exp(-Δener / syst.temperature)
             uold += Δener
-            naccept += 1
+            opts.naccept += 1
         end
     else
         syst.xpos[rng_part] = posold
@@ -38,7 +39,5 @@ function mcmove!(
         cl = UpdateCellList!(syst.xpos, syst.box, cl; parallel=parallel)
     end
 
-    @pack! opts = naccept
-
-    return uold, cl
+    return uold
 end
