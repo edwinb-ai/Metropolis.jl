@@ -31,7 +31,7 @@ mutable struct System{UnitCellType,N,T,M,VT}
 end
 
 function System(density::T, temp::T, particles::Int; dims=3) where {T<:Real}
-    box_size = particles / density
+    box_size = cbrt(particles / density)
     cutoff = box_size / 2.0
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=1)
     rng = Xorshifts.Xoroshiro128Plus()
@@ -43,7 +43,8 @@ function System(density::T, temp::T, particles::Int; dims=3) where {T<:Real}
 end
 
 function System(density::T, temp::T, particles::Int, cutoff::T; dims=3) where {T<:Real}
-    box_size = particles / density
+    box_size = cbrt(particles / density)
+    cutoff /= box_size
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=1)
     rng = Xorshifts.Xoroshiro128Plus()
     range = (zero(T), box_size)
