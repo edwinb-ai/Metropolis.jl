@@ -12,3 +12,5 @@ mutable struct EnsembleOptions{T,E}
 end
 
 EnsembleOptions(e::Ensemble) = EnsembleOptions(e, 0, 1)
+
+function mcmove! end

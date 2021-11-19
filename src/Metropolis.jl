@@ -10,10 +10,10 @@ using CellListMap
 using Parameters
 
 # Includes
+include(joinpath("ensembles", "ensemble.jl"))
 include("types.jl")
 include(joinpath("potentials", "potential.jl"))
 include(joinpath("potentials", "lennard_jones.jl"))
-include(joinpath("ensembles", "ensemble.jl"))
 include(joinpath("ensembles", "nvt.jl"))
 include("utils.jl")
 include("simulate.jl")
