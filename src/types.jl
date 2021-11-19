@@ -36,26 +36,20 @@ mutable struct System{B,T,VT,I}
 end
 
 function System(
-    density::T, temp::T, particles::I, cutoff::T; dims=3, random_init=true, lcell=2
+    density::T, temp::T, particles::I, cutoff::T; dims=3, lcell=2
 ) where {T<:Real,I<:Int}
     box_size = cbrt(T(particles) / density)
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = initialize_positions(box_size, rng, particles; random_init=random_init)
+    xpos = initialize_positions(box_size, rng, particles)
     syst = System(xpos, density, temp, box, rng, particles)
 
     return syst
 end
 
-function initialize_positions(box_size::T, rng, particles; random_init=true) where {T<:Real}
-    xpos = [zeros(Vec3D{T}) for _ in 1:particles]
-
-    if random_init
-        range = (zero(typeof(box_size)), box_size)
-        xpos = [random_vec(Vec3D{T}, range; rng=rng) for _ in 1:particles]
-    else
-        square_lattice!(xpos, particles, box_size)
-    end
+function initialize_positions(box_size::T, rng, particles) where {T<:Real}
+    range = (zero(typeof(box_size)), box_size)
+    xpos = [random_vec(Vec3D{T}, range; rng=rng) for _ in 1:particles]
 
     return xpos
 end
