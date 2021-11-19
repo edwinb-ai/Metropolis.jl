@@ -1,5 +1,5 @@
-function u_pack(x, box::Box, cl::CellList)
-    cl = UpdateCellList!(x, box, cl; parallel=false)
+function u_pack(x, box::Box, cl::CellList; parallel=false)
+    cl = UpdateCellList!(x, box, cl; parallel=parallel)
     u = map_pairwise!(
         (x, y, i, j, d2, u) -> begin
             u += (sqrt(d2) - box.cutoff)^2 # objective function
@@ -8,7 +8,7 @@ function u_pack(x, box::Box, cl::CellList)
         0.0,
         box,
         cl;
-        parallel=false,
+        parallel=parallel,
     )
     return u
 end
@@ -55,9 +55,9 @@ function forces_cl!(f::Vector{T}, x, box::Box, cl::CellList, fpair::F) where {T,
     return f
 end
 
-function packpositions(positions, box::Box)
+function packpositions(positions, box::Box; parallel=false)
     box_pack = Box(box.unit_cell_max, 0.5)
-    cl_pack = CellList(positions, box_pack)
+    cl_pack = CellList(positions, box_pack; parallel=parallel)
     xpos = gradient_descent!(
         copy(positions),
         (x) -> u_pack(x, box_pack, cl_pack),
@@ -67,17 +67,17 @@ function packpositions(positions, box::Box)
     return xpos, box_pack, cl_pack
 end
 
-function packsystem!(system::System, cl::CellList, uij)
-    uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
+function packsystem!(system::System, cl::CellList, uij; parallel=false)
+    uenergy = map_pairwise!(uij, 0.0, system.box, cl; parallel=parallel) / system.npart
     println("initial energy $(uenergy)")
 
     (pack_pos, boxpack, clpack) = packpositions(copy(system.xpos), system.box)
-    cl = UpdateCellList!(pack_pos, system.box, cl)
-    upacked = u_pack(pack_pos, boxpack, clpack)
+    cl = UpdateCellList!(pack_pos, system.box, cl; parallel=parallel)
+    upacked = u_pack(pack_pos, boxpack, clpack; parallel=parallel)
     system.xpos = copy(pack_pos)
     @show upacked
 
-    uenergy = map_pairwise!(uij, 0.0, system.box, cl) / system.npart
+    uenergy = map_pairwise!(uij, 0.0, system.box, cl; parallel=parallel) / system.npart
     println("initial energy $(uenergy)")
 
     return nothing
