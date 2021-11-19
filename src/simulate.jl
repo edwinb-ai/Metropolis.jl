@@ -41,15 +41,27 @@ function _simulation_loop!(system::System, uij, fij, opts, steps; kwargs...)
 end
 
 function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
-    @unpack system, ensemble, potential = sim
-
     # Obtain the energy function for the interaction potential
     (uij, fij, cl) = _setup_simulation(sim; parallel=parallel)
 
     # Create the ensemble options
-    opts = EnsembleOptions(ensemble)
+    opts = EnsembleOptions(sim.ensemble)
 
-    _simulation_loop!(system, uij, fij, opts, steps; cl=cl, parallel=parallel, ishow=ishow)
+    _simulation_loop!(
+        sim.system, uij, fij, opts, steps; cl=cl, parallel=parallel, ishow=ishow
+    )
+
+    return nothing
+end
+
+function _simulate_squared!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
+    # Obtain the energy function for the interaction potential
+    (uij, fij, _) = _setup_simulation(sim; parallel=parallel)
+
+    # Create the ensemble options
+    opts = EnsembleOptions(sim.ensemble)
+
+    _simulation_loop!(sim.system, uij, fij, opts, steps; parallel=parallel, ishow=ishow)
 
     return nothing
 end
