@@ -1,7 +1,7 @@
 name = "Metropolis"
 uuid = "02918670-6c22-4a47-9bc6-548bebbd8102"
 authors = ["Edwin Bedolla"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 CellListMap = "69e1c6dd-3888-40e6-b3c8-31ac5f578864"
