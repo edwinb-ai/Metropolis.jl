@@ -14,4 +14,5 @@ RandomNumbers = "e6cf234a-135c-5ec9-84dd-332b85af5143"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
+StaticArrays = "1"
 julia = "^1.6"
