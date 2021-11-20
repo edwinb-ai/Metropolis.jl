@@ -4,10 +4,11 @@ using Random
 using RandomNumbers.Xorshifts
 using ProgressMeter
 using StaticArrays
-using LinearAlgebra
+using LinearAlgebra: norm
 using FileIO
 using CellListMap
 using Parameters
+using InteractiveUtils
 
 # Includes
 include(joinpath("ensembles", "ensemble.jl"))
