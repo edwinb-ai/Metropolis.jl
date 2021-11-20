@@ -5,7 +5,7 @@ end
 
 NVT(x::V) where {V<:Real} = NVT(V(0.5), V(x))
 
-function mcmove!(syst::System, uij, fij, opts::EnsembleOptions{T,E}) where {E<:NVT,T<:Real}
+function mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
     (box_size, cutoff) = _box_information(syst.box)
     # Compute the current energy
     uold = _compute_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
@@ -19,7 +19,7 @@ function mcmove!(syst::System, uij, fij, opts::EnsembleOptions{T,E}) where {E<:N
     mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept; rng=syst.rng)
     if mcbool
         uold += Δener
-        opts.naccept += 1
+        opts.naccept += oneunit(T)
     else
         syst.xpos[rng_part] = posold
     end
@@ -28,8 +28,8 @@ function mcmove!(syst::System, uij, fij, opts::EnsembleOptions{T,E}) where {E<:N
 end
 
 function mcmove!(
-    syst::System, uij, fij, opts::EnsembleOptions{T,E}, cl::CellList; parallel=false
-) where {E<:NVT,T<:Int}
+    syst::System, uij, opts::EnsembleOptions{T,E}, cl::CellList; parallel=false
+) where {E<:NVT,T}
     # Compute the current energy
     uold = map_pairwise!(uij, 0.0, syst.box, cl; parallel=parallel)
     (posold, rng_part) = _choose_move!(
@@ -44,14 +44,14 @@ function mcmove!(
     mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept; rng=syst.rng)
     if mcbool
         uold += Δener
-        opts.naccept += one(T)
+        opts.naccept += oneunit(T)
     else
         syst.xpos[rng_part] = posold
         # Update cell lists
         cl = UpdateCellList!(syst.xpos, syst.box, cl; parallel=parallel)
     end
 
-    return uold
+    return uold, cl
 end
 
 function _mcnvt!(unew, uold, dener, temperature, accept; rng=Random.GLOBAL_RNG)
@@ -81,10 +81,10 @@ function _compute_energy(xpos, uij, box_size, cutoff, npart)
             Δij = xpos[i] - xpos[j]
 
             # Periodic boundaries
-            Δij = @. Δij - box_size * fld(Δij, box_size)
+            Δij = @. Δij - box_size * round(Δij / box_size)
 
             # Compute distance
-            Δpos = LinearAlgebra.norm(Δij)^2
+            Δpos = norm(Δij)^2
 
             if Δpos < cutoff
                 energy = uij(0.0, 0.0, 0, 0, Δpos, energy)
