@@ -10,33 +10,35 @@ function simulate!(sim::Simulation; pairwise=:cells, kwargs...)
     return nothing
 end
 
-function _setup_simulation(sim::Simulation; kwargs...)
+function _setup_simulation(system::System, potential::Potential; kwargs...)
     # Obtain the energy function for the interaction potential
-    (uij, fij) = interactions(sim.potential)
+    (uij, fij) = interactions(potential)
 
     # Build initial cell lists
-    cl = CellListMap.CellList(sim.system.xpos, sim.system.box; parallel=kwargs[:parallel])
+    cl = CellListMap.CellList(system.xpos, system.box; parallel=kwargs[:parallel])
 
     # Create a good enough configuration
-    packsystem!(sim.system, cl, uij)
+    packsystem!(system, cl, uij)
 
     return uij, fij, cl
 end
 
 function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
+    @unpack system, ensemble, potential = sim
     # Obtain the energy function for the interaction potential
-    (uij, _, cl) = _setup_simulation(sim; parallel=parallel)
+    (uij, _, cl) = _setup_simulation(system, potential; parallel=parallel)
 
     # Create the ensemble options
-    opts = EnsembleOptions(sim.ensemble)
+    opts = EnsembleOptions(ensemble)
+    aux = CellListMap.AuxThreaded(cl)
 
-    # for istep in 1:steps
-    @showprogress for istep in 1:steps
-        opts.nattempt += oneunit(opts.nattempt)
-        (uener, cl) = mcmove!(sim.system, uij, opts, cl; parallel=parallel)
+    for istep in 1:steps
+    # @showprogress for istep in 1:steps
+        opts.nattempt += 1
+        (uener, cl) = mcmove!(system, uij, opts, cl, aux; parallel=parallel)
 
         if istep % ishow == 0
-            @show uener / sim.system.npart
+            @show uener / system.npart
             @show opts.naccept / opts.nattempt
         end
 
@@ -47,15 +49,16 @@ function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=1
 end
 
 function _simulate_squared!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
+    @unpack system, ensemble, potential = sim
     # Obtain the energy function for the interaction potential
-    (uij, fij, _) = _setup_simulation(sim; parallel=parallel)
+    (uij, _, _) = _setup_simulation(system, potential; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(sim.ensemble)
 
-    @showprogress for istep in 1:steps
+    for istep in 1:steps
         opts.nattempt += 1
-        uener = mcmove!(sim.system, uij, fij, opts)
+        uener = mcmove!(sim.system, uij, opts)
 
         if istep % ishow == 0
             @show uener / sim.system.npart
