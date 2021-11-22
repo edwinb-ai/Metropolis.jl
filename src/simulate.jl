@@ -10,10 +10,7 @@ function simulate!(sim::Simulation; pairwise=:cells, kwargs...)
     return nothing
 end
 
-function _setup_simulation(system::System, potential::Potential; kwargs...)
-    # Obtain the energy function for the interaction potential
-    # (uij, fij) = interactions(potential)
-
+function _setup_simulation!(system::System, potential::Potential; kwargs...)
     # Build initial cell lists
     cl = CellListMap.CellList(system.xpos, system.box; parallel=kwargs[:parallel])
     cell_cache = _build_cache(cl)
@@ -21,21 +18,18 @@ function _setup_simulation(system::System, potential::Potential; kwargs...)
     # Create a good enough configuration
     packsystem!(system, cell_cache.cell, potential.energy)
 
-    # return uij, fij, cell_cache
     return cell_cache
 end
 
 function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     @unpack system, ensemble, potential = sim
     # Obtain the energy function for the interaction potential
-    # (uij, _, cell_cache) = _setup_simulation(system, potential; parallel=parallel)
-    cell_cache = _setup_simulation(system, potential; parallel=parallel)
+    cell_cache = _setup_simulation!(system, potential; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
 
-    # for istep in 1:steps
-    @showprogress for istep in 1:steps
+    for istep in 1:steps
         opts.nattempt += 1
         uener = mcmove!(system, potential.energy, opts, cell_cache; parallel=parallel)
 
@@ -53,17 +47,17 @@ end
 function _simulate_squared!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     @unpack system, ensemble, potential = sim
     # Obtain the energy function for the interaction potential
-    (uij, _, _) = _setup_simulation(system, potential; parallel=parallel)
+    _ = _setup_simulation!(system, potential; parallel=parallel)
 
     # Create the ensemble options
-    opts = EnsembleOptions(sim.ensemble)
+    opts = EnsembleOptions(ensemble)
 
-    @showprogress for istep in 1:steps
+    for istep in 1:steps
         opts.nattempt += 1
-        uener = mcmove!(sim.system, uij, opts)
+        uener = mcmove!(system, potential.energy, opts)
 
         if istep % ishow == 0
-            @show uener / sim.system.npart
+            @show uener / system.npart
             @show opts.naccept / opts.nattempt
         end
 

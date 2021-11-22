@@ -1,10 +1,3 @@
-"""
-    Potential
-
-Supertype for all kinds of interaction potentials.
-"""
-abstract type Potential end
-
 struct Vec3D{T} <: FieldVector{3,T}
     x::T
     y::T
@@ -67,8 +60,8 @@ A type to hold all relevant information for the simulation.
     of type `Ensemble`.
 - `potential::P`: the interaction potential between the particles, ideally an object of
 """
-struct Simulation
-    system::System
-    ensemble::Ensemble
-    potential::Potential
+struct Simulation{S,E,P}
+    system::S
+    ensemble::E
+    potential::P
 end
