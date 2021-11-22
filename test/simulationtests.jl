@@ -16,3 +16,8 @@ end
     sim = setupsim()
     @test_nowarn simulate!(sim; steps=10_000, parallel=false)
 end
+
+@testset "N-square" begin
+    sim = setupsim()
+    @test_nowarn simulate!(sim; pairwise=:squared, steps=10_000, parallel=false)
+end
