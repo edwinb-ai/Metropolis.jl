@@ -4,14 +4,17 @@ using Random
 using RandomNumbers.Xorshifts
 using ProgressMeter
 using StaticArrays
-using LinearAlgebra
+using LinearAlgebra: norm
 using FileIO
 using CellListMap
 using Parameters
+using InteractiveUtils
+using Base.Threads
 
 # Includes
 include(joinpath("ensembles", "ensemble.jl"))
 include("types.jl")
+include("caches.jl")
 include(joinpath("potentials", "potential.jl"))
 include(joinpath("potentials", "lennard_jones.jl"))
 include(joinpath("ensembles", "nvt.jl"))

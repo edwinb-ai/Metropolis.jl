@@ -1,10 +1,3 @@
-"""
-    Potential
-
-Supertype for all kinds of interaction potentials.
-"""
-abstract type Potential end
-
 struct Vec3D{T} <: FieldVector{3,T}
     x::T
     y::T
@@ -26,13 +19,14 @@ Holds all relevant information for the simulation system.
 - `rng::Random.AbstractRNG`: holds the RNG object for the system
 - `npart::Int`: total number of particles in the system
 """
-mutable struct System{B,T,VT,I}
+mutable struct System{B,T,VT,N,R}
     xpos::VT
     density::T
     temperature::T
     box::B
     rng::Random.AbstractRNG
-    npart::I
+    npart::N
+    npartrange::R
 end
 
 function System(
@@ -42,7 +36,7 @@ function System(
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
     xpos = initialize_positions(box_size, rng, particles)
-    syst = System(xpos, density, temp, box, rng, particles)
+    syst = System(xpos, density, temp, box, rng, particles, collect(1:particles))
 
     return syst
 end
@@ -66,8 +60,8 @@ A type to hold all relevant information for the simulation.
     of type `Ensemble`.
 - `potential::P`: the interaction potential between the particles, ideally an object of
 """
-struct Simulation
-    system::System
-    ensemble::Ensemble
-    potential::Potential
+struct Simulation{S,E,P}
+    system::S
+    ensemble::E
+    potential::P
 end
