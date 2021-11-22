@@ -77,12 +77,6 @@ function _choose_move!(positions, rng, δr, npartrange, movevec)
     return posold, rng_part
 end
 
-function _cells_energy(
-    uij::Function, box::CellListMap.Box, cl::CellListMap.CellList; parallel::Bool=false
-)
-    return map_pairwise!(uij, 0.0, box, cl; parallel=parallel)
-end
-
 function _squared_energy(xpos, uij, box_size, cutoff, npart)
     energy = 0.0
     rc = cutoff^2
