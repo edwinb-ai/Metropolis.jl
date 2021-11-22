@@ -10,7 +10,7 @@ function mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
     # Compute the current energy
     uold = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
     (posold, rng_part) = _choose_move!(
-        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange
+        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange, opts.movecache
     )
     # Compute the energy now
     unew = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
@@ -33,7 +33,7 @@ function mcmove!(
     # Compute the current energy
     uold = map_pairwise!(uij, 0.0, syst.box, ccache.cell; parallel=parallel)
     (posold, rng_part) = _choose_move!(
-        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange
+        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange, opts.movecache
     )
     # Update cell lists
     ccache.cell = UpdateCellList!(
@@ -67,11 +67,11 @@ function _mcnvt!(unew, uold, dener, temperature, accept, rng)
     end
 end
 
-function _choose_move!(positions, rng, δr, npartrange)
+function _choose_move!(positions, rng, δr, npartrange, movevec)
     rng_part = rand(rng, npartrange)
     posold = copy(positions[rng_part])
     # Move that particle
-    half_disp = 0.5 .- rand(rng, Vec3D)
+    half_disp = 0.5 .- rand!(rng, movevec)
     positions[rng_part] = @. posold + δr * half_disp
 
     return posold, rng_part
