@@ -28,17 +28,19 @@ function mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
 end
 
 function mcmove!(
-    syst::System, uij, opts::EnsembleOptions{T,E}, cl::CellList, aux; parallel=false
+    syst::System, uij, opts::EnsembleOptions{T,E}, ccache::CellCache; parallel=false
 ) where {E<:NVT,T}
     # Compute the current energy
-    uold = map_pairwise!(uij, 0.0, syst.box, cl; parallel=parallel)
+    uold = map_pairwise!(uij, 0.0, syst.box, ccache.cell; parallel=parallel)
     (posold, rng_part) = _choose_move!(
         syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange
     )
     # Update cell lists
-    cl = UpdateCellList!(syst.xpos, syst.box, cl, aux; parallel=parallel)
+    ccache.cell = UpdateCellList!(
+        syst.xpos, syst.box, ccache.cell, ccache.aux; parallel=parallel
+    )
     # Compute the energy now
-    unew = map_pairwise!(uij, 0.0, syst.box, cl; parallel=parallel)
+    unew = map_pairwise!(uij, 0.0, syst.box, ccache.cell; parallel=parallel)
     Δener = unew - uold
 
     mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept, syst.rng)
@@ -48,10 +50,12 @@ function mcmove!(
     else
         syst.xpos[rng_part] = posold
         # Update cell lists
-        cl = UpdateCellList!(syst.xpos, syst.box, cl, aux; parallel=parallel)
+        ccache.cell = UpdateCellList!(
+            syst.xpos, syst.box, ccache.cell, ccache.aux; parallel=parallel
+        )
     end
 
-    return uold, cl
+    return uold
 end
 
 function _mcnvt!(unew, uold, dener, temperature, accept, rng)

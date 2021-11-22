@@ -12,30 +12,32 @@ end
 
 function _setup_simulation(system::System, potential::Potential; kwargs...)
     # Obtain the energy function for the interaction potential
-    (uij, fij) = interactions(potential)
+    # (uij, fij) = interactions(potential)
 
     # Build initial cell lists
     cl = CellListMap.CellList(system.xpos, system.box; parallel=kwargs[:parallel])
+    cell_cache = _build_cache(cl)
 
     # Create a good enough configuration
-    packsystem!(system, cl, uij)
+    packsystem!(system, cell_cache.cell, potential.energy)
 
-    return uij, fij, cl
+    # return uij, fij, cell_cache
+    return cell_cache
 end
 
 function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=10_000)
     @unpack system, ensemble, potential = sim
     # Obtain the energy function for the interaction potential
-    (uij, _, cl) = _setup_simulation(system, potential; parallel=parallel)
+    # (uij, _, cell_cache) = _setup_simulation(system, potential; parallel=parallel)
+    cell_cache = _setup_simulation(system, potential; parallel=parallel)
 
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
-    aux = CellListMap.AuxThreaded(cl)
 
-    for istep in 1:steps
-    # @showprogress for istep in 1:steps
+    # for istep in 1:steps
+    @showprogress for istep in 1:steps
         opts.nattempt += 1
-        (uener, cl) = mcmove!(system, uij, opts, cl, aux; parallel=parallel)
+        uener = mcmove!(system, potential.energy, opts, cell_cache; parallel=parallel)
 
         if istep % ishow == 0
             @show uener / system.npart
@@ -56,7 +58,7 @@ function _simulate_squared!(sim::Simulation; steps=10_000, parallel=false, ishow
     # Create the ensemble options
     opts = EnsembleOptions(sim.ensemble)
 
-    for istep in 1:steps
+    @showprogress for istep in 1:steps
         opts.nattempt += 1
         uener = mcmove!(sim.system, uij, opts)
 
