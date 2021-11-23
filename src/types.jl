@@ -1,4 +1,4 @@
-struct Vec3D{T} <: FieldVector{3,T}
+mutable struct Vec3D{T} <: FieldVector{3,T}
     x::T
     y::T
     z::T

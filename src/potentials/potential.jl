@@ -11,7 +11,7 @@ abstract type Potential end
 Type for all potentials that implement an potential energy
 and a force function. For example, the Lennard-Jones potential.
 """
-struct Continuous <: Potential end
+abstract type Continuous <: Potential end
 
 """
     Discrete <: Potential
@@ -19,4 +19,4 @@ struct Continuous <: Potential end
 Type for all potentials that only implement a potential energy, due
 to its discontinuous nature. For example, the hard-sphere potential.
 """
-struct Discrete <: Potential end
+abstract type Discrete <: Potential end
