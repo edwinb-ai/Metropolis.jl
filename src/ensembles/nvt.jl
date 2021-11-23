@@ -5,13 +5,14 @@ end
 
 NVT(x::V) where {V<:Real} = NVT(V(0.5), V(x))
 
-function mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
+function _mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
     (box_size, cutoff) = _box_information(syst.box)
     # Compute the current energy
     uold = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
     (posold, rng_part) = _choose_move!(
-        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange, opts.movecache
+        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange
     )
+    syst.xpos[rng_part] -= @. box_size * round(syst.xpos[rng_part] / box_size)
     # Compute the energy now
     unew = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
     Δener = unew - uold
@@ -27,13 +28,13 @@ function mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
     return uold
 end
 
-function mcmove!(
+function _mcmove!(
     syst::System, uij, opts::EnsembleOptions{T,E}, ccache::CellCache; parallel=false
 ) where {E<:NVT,T}
     # Compute the current energy
     uold = map_pairwise!(uij, 0.0, syst.box, ccache.cell; parallel=parallel)
     (posold, rng_part) = _choose_move!(
-        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange, opts.movecache
+        syst.xpos, syst.rng, opts.ensemble.δr, syst.npartrange
     )
     # Update cell lists
     ccache.cell = UpdateCellList!(
@@ -67,31 +68,30 @@ function _mcnvt!(unew, uold, dener, temperature, accept, rng)
     end
 end
 
-function _choose_move!(positions, rng, δr, npartrange, movevec)
+function _choose_move!(positions, rng, δr, npartrange)
     rng_part = rand(rng, npartrange)
     posold = copy(positions[rng_part])
     # Move that particle
-    half_disp = 0.5 .- rand!(rng, movevec)
-    positions[rng_part] = @. posold + δr * half_disp
+    postrial = 0.5 .- rand!(positions[rng_part])
+    positions[rng_part] = @. posold + δr * postrial
 
     return posold, rng_part
 end
 
 function _squared_energy(xpos, uij, box_size, cutoff, npart)
     energy = 0.0
-    rc = cutoff^2
 
     @inbounds for i in 1:(npart - 1)
         for j in (i + 1):npart
-            Δij = xpos[i] - xpos[j]
+            Δij = xpos[j] - xpos[i]
 
             # Periodic boundaries
-            Δij = @. Δij - box_size * round(Δij / box_size)
+            @. Δij -= box_size * round(Δij / box_size)
 
             # Compute distance
             Δpos = norm(Δij)^2
 
-            if Δpos < rc
+            if Δpos < cutoff
                 energy = uij(0.0, 0.0, 0, 0, Δpos, energy)
             end
         end

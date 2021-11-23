@@ -1,8 +1,22 @@
-struct Vec3D{T} <: FieldVector{3,T}
+"""
+    Vec3D{T} <: FieldVector{3,T}
+
+A custom type for mutable static arrays. It completely resembles a 3D point
+object in some geometric space.
+
+# Fields
+- `x::T`: first field of `Vec3D`
+- `y::T`: second field of `Vec3D`
+- `z::T`: third field of `Vec3D`
+"""
+mutable struct Vec3D{T} <: FieldVector{3,T}
     x::T
     y::T
     z::T
 end
+
+"Define `similar_type` to preserve array type through array operations."
+StaticArrays.similar_type(::Type{<:Vec3D}, ::Type{T}, s::Size{(3,)}) where {T} = Vec3D{T}
 
 """
     System{V<:Real}
@@ -35,13 +49,13 @@ function System(
     box_size = cbrt(T(particles) / density)
     box = CellListMap.Box(fill(box_size, dims), cutoff; lcell=lcell)
     rng = Xorshifts.Xoroshiro128Plus()
-    xpos = initialize_positions(box_size, rng, particles)
+    xpos = _initialize_positions(box_size, rng, particles)
     syst = System(xpos, density, temp, box, rng, particles, collect(1:particles))
 
     return syst
 end
 
-function initialize_positions(box_size::T, rng, particles) where {T<:Real}
+function _initialize_positions(box_size::T, rng, particles) where {T<:Real}
     range = (zero(typeof(box_size)), box_size)
     xpos = [random_vec(Vec3D{T}, range; rng=rng) for _ in 1:particles]
 
