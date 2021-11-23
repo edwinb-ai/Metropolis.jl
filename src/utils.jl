@@ -21,8 +21,8 @@ function adjust!(opts::EnsembleOptions)
 end
 
 function _box_information(box::CellListMap.Box)
-    box_size = box.unit_cell_max
-    cutoff = box.cutoff
+    box_size = box.unit_cell_max[begin]
+    cutoff = box.cutoff^2
 
     return box_size, cutoff
 end
