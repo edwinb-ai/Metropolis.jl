@@ -73,8 +73,8 @@ function _choose_move!(positions, rng, δr, npartrange)
     rng_part = rand(rng, npartrange)
     posold = copy(positions[rng_part])
     # Move that particle
-    # postrial = 0.5 .- rand!(positions[rng_part])
-    positions[rng_part] = posold .+ δr .* (0.5 .- rand!(positions[rng_part]))
+    postrial = 0.5 .- rand!(positions[rng_part])
+    positions[rng_part] = @. posold + δr * postrial
 
     return posold, rng_part
 end
