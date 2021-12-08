@@ -29,7 +29,8 @@ function _simulate_cells!(sim::Simulation; steps=10_000, parallel=false, ishow=1
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
 
-    for istep in 1:steps
+    @showprogress for istep in 1:steps
+    # for istep in 1:steps
         opts.nattempt += 1
         uener = _mcmove!(system, potential.energy, opts, cell_cache; parallel=parallel)
 
@@ -52,6 +53,7 @@ function _simulate_squared!(sim::Simulation; steps=10_000, parallel=false, ishow
     # Create the ensemble options
     opts = EnsembleOptions(ensemble)
 
+    # @showprogress for istep in 1:steps
     for istep in 1:steps
         opts.nattempt += 1
         uener = _mcmove!(system, potential.energy, opts)
