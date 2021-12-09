@@ -56,7 +56,7 @@ function System(
 end
 
 function _initialize_positions(box_size::T, rng, particles) where {T<:Real}
-    range = (zero(typeof(box_size)), box_size)
+    range = (zero(T), box_size)
     xpos = [random_vec(Vec3D{T}, range; rng=rng) for _ in 1:particles]
 
     return xpos

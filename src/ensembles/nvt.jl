@@ -18,7 +18,7 @@ function _mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T
     unew = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
     Δener = unew - uold
 
-    mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept, syst.rng)
+    mcbool = _mcnvt!(Δener, syst.temperature, syst.rng)
     if mcbool
         uold += Δener
         opts.naccept += oneunit(T)
@@ -60,9 +60,8 @@ function _mcmove!(
     return uold
 end
 
-function _mcnvt!(Δener, temperature, rng)
-    if Δener < 0.0 || (rand(rng) < exp(-Δener / temperature))
-        # accept += oneunit(accept)
+function _mcnvt!(Δener::T, temperature::T, rng) where {T}
+    if Δener < zero(T) || (rand(rng) < exp(-Δener / temperature))
         return true
     else
         return false
