@@ -7,10 +7,9 @@ struct LennardJones <: Continuous
 
         function forces(x, y, i, j, d2, f)
             r = x - y
-            dudr = lj.force(d2, r)
+            dudr = -24.0 * r * ((1.0 / d2^7) - (1.0 / d2^4))
             @inbounds f[i] = f[i] + dudr
             @inbounds f[j] = f[j] - dudr
-            -24.0 * r * ((1.0 / d2^7) - (1.0 / d2^4))
 
             return f
         end

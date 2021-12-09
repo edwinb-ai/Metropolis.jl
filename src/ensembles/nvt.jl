@@ -3,7 +3,8 @@ mutable struct NVT{V<:Real} <: Ensemble
     accept::V
 end
 
-NVT(x::V) where {V<:Real} = NVT(V(0.5), V(x))
+NVT() = NVT(0.5, 0.4)
+NVT(x::V) where {V<:Real} = NVT(V(0.5), x)
 
 function _mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T}
     (box_size, cutoff) = _box_information(syst.box)
@@ -17,7 +18,7 @@ function _mcmove!(syst::System, uij, opts::EnsembleOptions{T,E}) where {E<:NVT,T
     unew = _squared_energy(syst.xpos, uij, box_size, cutoff, syst.npart)
     Δener = unew - uold
 
-    mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept, syst.rng)
+    mcbool = _mcnvt!(Δener, syst.temperature, syst.rng)
     if mcbool
         uold += Δener
         opts.naccept += oneunit(T)
@@ -44,7 +45,7 @@ function _mcmove!(
     unew = map_pairwise!(uij, 0.0, syst.box, ccache.cell; parallel=parallel)
     Δener = unew - uold
 
-    mcbool = _mcnvt!(unew, uold, Δener, syst.temperature, opts.naccept, syst.rng)
+    mcbool = _mcnvt!(Δener, syst.temperature, syst.rng)
     if mcbool
         uold += Δener
         opts.naccept += oneunit(T)
@@ -59,9 +60,8 @@ function _mcmove!(
     return uold
 end
 
-function _mcnvt!(unew, uold, dener, temperature, accept, rng)
-    if unew < uold || (rand(rng) < exp(-dener / temperature))
-        accept += oneunit(accept)
+function _mcnvt!(Δener::T, temperature::T, rng) where {T}
+    if Δener < zero(T) || (rand(rng) < exp(-Δener / temperature))
         return true
     else
         return false
